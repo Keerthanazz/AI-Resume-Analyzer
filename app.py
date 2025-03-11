@@ -13,8 +13,13 @@ import re
 from flask_session import Session  # For persistent session storage
 import threading  # Added for background processing
 import random  # For API key rotation
+import pytesseract  # ✅ Make sure this is already imported
+import platform
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+else:
+    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
