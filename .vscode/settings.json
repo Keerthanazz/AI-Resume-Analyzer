@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.py": "python",
+    "plyconfig.json": "jsonc"
+  }
+}

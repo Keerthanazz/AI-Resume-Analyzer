@@ -1,0 +1,85 @@
+{% extends "base.html" %} {% block title %}About Resume Analyzer{% endblock %} {% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">About Resume Analyzer</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>AI-Powered Job Application Helper</h3>
+                        <p class="lead">Resume Analyzer is an advanced tool that helps job seekers optimize their applications using artificial intelligence.</p>
+
+                        <h4 class="mt-4">How It Works</h4>
+                        <div class="mt-3">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-file-earmark-text me-2"></i>1. Upload Your Resume</h5>
+                                    <p class="card-text">Upload your resume in PDF format. Our system extracts the content and analyzes it to understand your skills and experience.</p>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-search me-2"></i>2. Job Compatibility Analysis</h5>
+                                    <p class="card-text">Enter a job description and company details. We'll analyze how well your resume matches the job requirements and identify strengths and gaps.</p>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-journal-text me-2"></i>3. Resume Optimization</h5>
+                                    <p class="card-text">Get a tailored version of your resume optimized for the specific job, highlighting relevant skills and experiences.</p>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="bi bi-graph-up me-2"></i>4. Skill Enhancement Plan</h5>
+                                    <p class="card-text">Receive a personalized plan to develop the skills you need to become a stronger candidate, including recommended resources and courses.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4 class="mt-4">Powered by AI</h4>
+                        <p>Resume Analyzer uses advanced AI models to provide accurate and helpful analysis. The platform leverages Google's Gemini AI to understand both your resume and job requirements, offering insights that would typically require a career
+                            counselor or HR professional.</p>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card mb-4 bg-light">
+                            <div class="card-body">
+                                <h4 class="card-title">Features</h4>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item bg-light">Resume text extraction</li>
+                                    <li class="list-group-item bg-light">Initial resume analysis</li>
+                                    <li class="list-group-item bg-light">Job compatibility scoring</li>
+                                    <li class="list-group-item bg-light">Skills gap identification</li>
+                                    <li class="list-group-item bg-light">Resume optimization</li>
+                                    <li class="list-group-item bg-light">Personalized skill development plan</li>
+                                    <li class="list-group-item bg-light">Downloadable reports</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Data Privacy</h4>
+                                <p>Your resume and job details are processed securely. We do not store your personal information for longer than necessary to provide our services.</p>
+                                <p>All analysis is performed using secure AI processing that respects your privacy.</p>
+                                <a href="#" class="btn btn-outline-primary btn-sm">Privacy Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 text-center">
+                    <p class="lead">Ready to optimize your job application?</p>
+                    <a href="{{ url_for('resume_analysis') }}" class="btn btn-primary btn-lg">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

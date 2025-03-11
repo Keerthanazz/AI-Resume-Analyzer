@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <h1>Welcome to Job Application Analyzer</h1>
+    <nav>
+        <a href="{{ url_for('resume_analysis') }}">Resume Analysis</a>
+        <a href="{{ url_for('job_compatibility') }}">Job Compatibility</a>
+        <a href="{{ url_for('about') }}">About</a>
+    </nav>
+</body>
+
+</html>

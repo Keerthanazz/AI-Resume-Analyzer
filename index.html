@@ -1,0 +1,212 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Application Analyzer</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
+    <style>
+      body {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+      }
+
+      .section-container {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        background-color: #f8f9fa;
+      }
+
+      .analysis-box {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        background-color: white;
+        height: 300px;
+        overflow-y: auto;
+      }
+
+      .markdown-content h1,
+      .markdown-content h2 {
+        font-size: 1.5rem;
+      }
+
+      .markdown-content h3 {
+        font-size: 1.25rem;
+      }
+
+      .markdown-content ul,
+      .markdown-content ol {
+        padding-left: 1.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4">Student Resume Analyzer & Optimizer</h1>
+
+      {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+      {% endif %}
+
+      <!-- Step 1: Resume Upload and Initial Analysis -->
+      <div class="section-container">
+        <h2>1. Resume Analysis</h2>
+        {% if not resume_text %}
+        <form
+          action="{{ url_for('analyze_resume') }}"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          <div class="mb-3">
+            <label for="resume" class="form-label"
+              >Upload your resume (PDF)</label
+            >
+            <input
+              class="form-control"
+              type="file"
+              id="resume"
+              name="resume"
+              accept=".pdf"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Analyze Resume</button>
+        </form>
+        {% else %}
+        <div class="row">
+          <div class="col-md-6">
+            <h3>Extracted Resume</h3>
+            <div class="analysis-box">
+              <pre>{{ resume_text }}</pre>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h3>Initial Analysis</h3>
+            <div class="analysis-box markdown-content">
+              {{ initial_analysis | safe }}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Step 2: Job and Company Analysis -->
+      {% if resume_text and initial_analysis and (step|int) >= 2 %}
+      <div class="section-container">
+        <h2>2. Job Compatibility Analysis</h2>
+        {% if not job_analysis %}
+        <form action="{{ url_for('analyze_job') }}" method="post">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="company_name" class="form-label">Company Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="company_name"
+                name="company_name"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="job_title" class="form-label">Job Title</label>
+              <input
+                type="text"
+                class="form-control"
+                id="job_title"
+                name="job_title"
+                required
+              />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="job_description" class="form-label"
+              >Paste Job Description</label
+            >
+            <textarea
+              class="form-control"
+              id="job_description"
+              name="job_description"
+              rows="6"
+              required
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            Analyze Job Compatibility
+          </button>
+        </form>
+        {% else %}
+        <div class="mb-3">
+          <h3>Company: {{ company_name }} - {{ job_title }}</h3>
+        </div>
+        <div class="analysis-box markdown-content">
+          {{ job_analysis | safe }}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Step 3: Skill Enhancement Plan -->
+      {% if job_analysis and (step|int) >= 3 %}
+      <div class="section-container">
+        <h2>3. Skill Enhancement Plan</h2>
+        {% if not skill_plan %}
+        <form action="{{ url_for('generate_skill_plan') }}" method="post">
+          <button type="submit" class="btn btn-primary">
+            Generate Skill Enhancement Plan
+          </button>
+        </form>
+        {% else %}
+        <div class="analysis-box markdown-content">{{ skill_plan | safe }}</div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Step 4: Optimized Resume -->
+      {% if job_analysis and (step|int) >= 4 %}
+      <div class="section-container">
+        <h2>4. Resume Optimizer</h2>
+        {% if not optimized_resume %}
+        <form action="{{ url_for('generate_optimized_resume') }}" method="post">
+          <button type="submit" class="btn btn-primary">
+            Generate Optimized Resume
+          </button>
+        </form>
+        {% else %}
+        <div class="analysis-box markdown-content">
+          {{ optimized_resume | safe }}
+        </div>
+        <a href="{{ url_for('download_resume') }}" class="btn btn-success mt-3">
+          Download Optimized Resume
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Optional: Add custom JS to handle markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      // Convert markdown content to HTML
+      document.addEventListener("DOMContentLoaded", function () {
+        const markdownElements = document.querySelectorAll(".markdown-content");
+        markdownElements.forEach((element) => {
+          const content = element.innerHTML.trim();
+          if (content) {
+            element.innerHTML = marked.parse(content);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

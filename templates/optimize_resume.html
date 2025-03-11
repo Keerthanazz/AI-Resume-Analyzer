@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+    <h2 class="mb-4">ATS-Optimized Resume</h2>
+
+    {% include 'includes/flash_messages.html' %}
+
+    <div class="row">
+        <div class="col-md-12">
+            {% if not optimized_resume %}
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-file-alt me-2"></i>Generate Optimized Resume
+                </div>
+                <div class="card-body">
+                    <p>Create an ATS-optimized resume tailored to the job description and company requirements.</p>
+                    <form action="{{ url_for('generate_optimized_resume_submit') }}" method="POST">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-magic me-2"></i>Generate Optimized Resume
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-file-alt me-2"></i>ATS-Optimized Resume
+                        </div>
+                        <div>
+                            <a href="{{ url_for('download_resume') }}" class="btn btn-sm btn-success">
+                                <i class="fas fa-download me-2"></i>Download Resume
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5><strong>Optimized for:</strong> {{ job_title }} at {{ company_name }}</h5>
+                    </div>
+                    <div class="optimized-resume-content">
+                        <pre>{{ optimized_resume }}</pre>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <a href="{{ url_for('job_compatibility') }}" class="btn btn-secondary w-100">
+                <i class="fas fa-arrow-left me-2"></i>Back to Job Compatibility
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="{{ url_for('skill_enhancement') }}" class="btn btn-primary w-100">
+                <i class="fas fa-graduation-cap me-2"></i>Skill Enhancement Plan
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

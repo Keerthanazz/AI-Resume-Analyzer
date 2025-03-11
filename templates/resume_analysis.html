@@ -1,0 +1,65 @@
+{% extends "base.html" %} {% block title %}Upload Resume{% endblock %} {% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Upload Your Resume</h2>
+            </div>
+            <div class="card-body">
+                <div class="step-section">
+                    <h4>Upload your resume PDF file</h4>
+                    <p>We'll analyze your resume to extract key information and provide insights.</p>
+
+                    <form action="{{ url_for('resume_analysis') }}" method="post" enctype="multipart/form-data" class="mt-3">
+                        <div class="mb-3">
+                            <label for="resume_file" class="form-label">Select Resume PDF</label>
+                            <input type="file" class="form-control" id="resume_file" name="resume_file" accept=".pdf" required>
+                            <div class="form-text">Only PDF files are supported.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload & Analyze Resume</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if resume_text %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Extracted Resume Text</h2>
+            </div>
+            <div class="card-body">
+                <pre>{{ resume_text }}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Initial Analysis</h2>
+            </div>
+            <div class="card-body">
+                {% if initial_analysis %}
+                <div class="analysis-section">
+                    {{ initial_analysis | safe }}
+                </div>
+                <div class="mt-4">
+                    <a href="{{ url_for('job_compatibility') }}" class="btn btn-success">Proceed to Job Compatibility Analysis</a>
+                </div>
+                {% else %}
+                <div class="loading-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Analyzing your resume...</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %} {% endblock %}

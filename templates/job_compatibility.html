@@ -1,0 +1,159 @@
+{% extends "base.html" %} {% block title %}Job Compatibility Analysis{% endblock %} {% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Job Compatibility Analysis</h2>
+            </div>
+            <div class="card-body">
+                <div class="step-section">
+                    <h4>Enter Job Details</h4>
+                    <p>Provide the job description and company information to analyze how well your resume matches the position.</p>
+
+                    <form action="{{ url_for('job_compatibility') }}" method="post" class="mt-3">
+                        <div class="mb-3">
+                            <label for="company_name" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="company_name" name="company_name" value="{{ company_name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="role_title" class="form-label">Job Title</label>
+                            <input type="text" class="form-control" id="role_title" name="role_title" value="{{ role_title }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="job_description" class="form-label">Job Description</label>
+                            <textarea class="form-control" id="job_description" name="job_description" rows="8" required>{{ job_description }}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Analyze Compatibility</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if job_description and processing %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Analysis in Progress</h2>
+            </div>
+            <div class="card-body">
+                <div class="loading-spinner" id="loading-area">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Analyzing job compatibility... This may take a moment.</p>
+                    <div class="progress">
+                        <div id="analysis-progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%"></div>
+                    </div>
+                </div>
+                <div id="analysis-result" style="display: none;">
+                    <!-- Results will be loaded here via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %} {% if job_analysis and not processing %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Job Compatibility Results</h2>
+            </div>
+            <div class="card-body">
+                <div class="analysis-section">
+                    {{ job_analysis | safe }}
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        {% if not has_optimized_resume %}
+                        <form action="{{ url_for('optimize_resume') }}" method="post">
+                            <button type="submit" class="btn btn-success w-100 mb-3">Generate Optimized Resume</button>
+                        </form>
+                        {% else %}
+                        <a href="{{ url_for('download_resume') }}" class="btn btn-success w-100 mb-3">Download Optimized Resume</a> {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if not has_skill_plan %}
+                        <a href="{{ url_for('skill_enhancement') }}" class="btn btn-primary w-100 mb-3">Create Skill Enhancement Plan</a> {% else %}
+                        <a href="{{ url_for('skill_enhancement') }}" class="btn btn-primary w-100 mb-3">View Skill Enhancement Plan</a> {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %} {% endblock %} {% block scripts %} {% if job_description and processing %}
+<script>
+    $(document).ready(function() {
+        let progressBar = $('#analysis-progress');
+        let progress = 25;
+        let loadingArea = $('#loading-area');
+        let resultArea = $('#analysis-result');
+
+        // Animated progress bar
+        let progressInterval = setInterval(function() {
+            progress += 5;
+            if (progress > 90) progress = 90;
+            progressBar.css('width', progress + '%');
+        }, 1000);
+
+        // Check analysis status
+        function checkAnalysisStatus() {
+            $.ajax({
+                url: '{{ url_for("get_analysis_status") }}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.status === 'completed') {
+                        // Analysis completed, show results
+                        clearInterval(progressInterval);
+                        progressBar.css('width', '100%');
+                        setTimeout(function() {
+                            loadingArea.hide();
+                            resultArea.html(data.result);
+                            resultArea.show();
+
+                            // Add buttons
+                            let buttons = `
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <form action="{{ url_for('optimize_resume') }}" method="post">
+                                            <button type="submit" class="btn btn-success w-100 mb-3">Generate Optimized Resume</button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="{{ url_for('skill_enhancement') }}" class="btn btn-primary w-100 mb-3">Create Skill Enhancement Plan</a>
+                                    </div>
+                                </div>
+                            `;
+                            resultArea.append(buttons);
+
+                            // Reload page to show completed results properly
+                            location.reload();
+                        }, 1000);
+                    } else if (data.status === 'error') {
+                        // Show error
+                        clearInterval(progressInterval);
+                        loadingArea.html(`<div class="alert alert-danger">Error: ${data.message}</div>`);
+                    } else {
+                        // Check again in 3 seconds
+                        setTimeout(checkAnalysisStatus, 3000);
+                    }
+                },
+                error: function() {
+                    // Handle AJAX error
+                    loadingArea.html('<div class="alert alert-danger">Error checking analysis status. Please try again.</div>');
+                    clearInterval(progressInterval);
+                }
+            });
+        }
+
+        // Start checking status
+        setTimeout(checkAnalysisStatus, 2000);
+    });
+</script>
+{% endif %} {% endblock %}

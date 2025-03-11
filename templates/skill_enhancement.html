@@ -1,0 +1,143 @@
+{% extends "base.html" %} {% block title %}Skill Enhancement Plan{% endblock %} {% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Skill Enhancement Plan</h2>
+            </div>
+            <div class="card-body">
+                <div class="step-section">
+                    <h4>Create Your Personalized Skill Development Plan</h4>
+                    <p>Based on your resume and the job requirements, we'll create a customized plan to help you improve your skills and become a stronger candidate.</p>
+
+                    {% if not company_name %}
+                    <div class="alert alert-warning">
+                        <p>You need to complete job compatibility analysis first before generating a skill enhancement plan.</p>
+                        <a href="{{ url_for('job_compatibility') }}" class="btn btn-primary mt-2">Go to Job Compatibility</a>
+                    </div>
+                    {% elif not processing and not skill_plan %}
+                    <form action="{{ url_for('skill_enhancement') }}" method="post" class="mt-3">
+                        <div class="alert alert-info">
+                            <p>We'll analyze your resume against the job requirements for <strong>{{ role_title }}</strong> at <strong>{{ company_name }}</strong> and create a skill enhancement plan.</p>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Generate Skill Enhancement Plan</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if processing %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Generating Skill Plan</h2>
+            </div>
+            <div class="card-body">
+                <div class="loading-spinner" id="loading-area">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Creating your personalized skill enhancement plan... This may take a moment.</p>
+                    <div class="progress">
+                        <div id="plan-progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 25%"></div>
+                    </div>
+                </div>
+                <div id="plan-result" style="display: none;">
+                    <!-- Results will be loaded here via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %} {% if skill_plan and not processing %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Your Personalized Skill Enhancement Plan</h2>
+                <a href="{{ url_for('download_skill_plan') }}" class="btn btn-success">Download Plan</a>
+            </div>
+            <div class="card-body">
+                <div class="analysis-section skill-plan-content">
+                    {{ skill_plan | safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %} {% endblock %} {% block scripts %} {% if processing %}
+<script>
+    $(document).ready(function() {
+        let progressBar = $('#plan-progress');
+        let progress = 25;
+        let loadingArea = $('#loading-area');
+        let resultArea = $('#plan-result');
+
+        // Animated progress bar
+        let progressInterval = setInterval(function() {
+            progress += 3;
+            if (progress > 90) progress = 90;
+            progressBar.css('width', progress + '%');
+        }, 1000);
+
+        // Check skill plan status
+        function checkSkillPlanStatus() {
+            $.ajax({
+                url: '{{ url_for("get_skill_plan_status") }}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if (data.status === 'completed') {
+                        // Plan completed, show results
+                        clearInterval(progressInterval);
+                        progressBar.css('width', '100%');
+                        setTimeout(function() {
+                            loadingArea.hide();
+                            resultArea.html(`
+                                <div class="analysis-section skill-plan-content">
+                                    ${data.result}
+                                </div>
+                                <div class="text-end mt-3">
+                                    <a href="{{ url_for('download_skill_plan') }}" class="btn btn-success">Download Plan</a>
+                                </div>
+                            `);
+                            resultArea.show();
+
+                            // Reload page to show completed results properly
+                            location.reload();
+                        }, 1000);
+                    } else if (data.status === 'error') {
+                        // Show error
+                        clearInterval(progressInterval);
+                        loadingArea.html(`<div class="alert alert-danger">Error: ${data.message}</div>`);
+                    } else {
+                        // Check again in 3 seconds
+                        setTimeout(checkSkillPlanStatus, 3000);
+                    }
+                },
+                error: function() {
+                    // Handle AJAX error
+                    loadingArea.html('<div class="alert alert-danger">Error checking plan generation status. Please try again.</div>');
+                    clearInterval(progressInterval);
+                }
+            });
+        }
+
+        // Start checking status
+        setTimeout(checkSkillPlanStatus, 2000);
+    });
+</script>
+{% endif %}
+
+<script>
+    // Function to add styling to the skill plan sections
+    $(document).ready(function() {
+        $('.skill-plan-content').find('h1, h2, h3').addClass('mt-4 mb-3');
+        $('.skill-plan-content').find('ul, ol').addClass('mb-3');
+    });
+</script>
+{% endblock %}
